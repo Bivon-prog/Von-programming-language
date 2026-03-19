@@ -1,0 +1,7 @@
+name = input("Enter your name: ")
+a = num(input("Enter first number: "))
+b = num(input("Enter second number: "))
+
+sum = a + b
+print("Hello, " + name + "!")
+print("The sum of " + str(a) + " and " + str(b) + " is " + str(sum))
