@@ -1,0 +1,78 @@
+# Von Language — Classes Demo
+
+# ── 1. Basic class with fields and methods ──────────────────────────
+
+class Rectangle:
+    def init(self, width, height):
+        self.width = width
+        self.height = height
+
+    def area(self):
+        return self.width * self.height
+
+    def perimeter(self):
+        return 2 * (self.width + self.height)
+
+    def describe(self):
+        print("Rectangle " + str(self.width) + "x" + str(self.height))
+        print("  Area:      " + str(self.area()))
+        print("  Perimeter: " + str(self.perimeter()))
+
+
+# ── 2. Another class ────────────────────────────────────────────────
+
+class Circle:
+    def init(self, radius):
+        self.radius = radius
+
+    def area(self):
+        return pi * self.radius * self.radius
+
+    def perimeter(self):
+        return 2 * pi * self.radius
+
+    def describe(self):
+        print("Circle r=" + str(self.radius))
+        print("  Area:      " + str(round(self.area(), 4)))
+        print("  Perimeter: " + str(round(self.perimeter(), 4)))
+
+
+# ── 3. Class with logic in methods ──────────────────────────────────
+
+class BankAccount:
+    def init(self, owner, balance):
+        self.owner   = owner
+        self.balance = balance
+
+    def deposit(self, amount):
+        self.balance = self.balance + amount
+        print(self.owner + " deposited " + str(amount) + " → balance: " + str(self.balance))
+
+    def withdraw(self, amount):
+        if amount > self.balance:
+            print("Insufficient funds!")
+        else:
+            self.balance = self.balance - amount
+            print(self.owner + " withdrew " + str(amount) + " → balance: " + str(self.balance))
+
+    def show(self):
+        print("Account[" + self.owner + "] balance: " + str(self.balance))
+
+
+# ── Run it ───────────────────────────────────────────────────────────
+
+print("=== Shapes ===")
+r = Rectangle(6, 4)
+r.describe()
+
+c = Circle(5)
+c.describe()
+
+print("")
+print("=== Bank Account ===")
+acc = BankAccount("Alice", 1000)
+acc.show()
+acc.deposit(500)
+acc.withdraw(200)
+acc.withdraw(2000)
+acc.show()

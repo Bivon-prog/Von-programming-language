@@ -49,6 +49,14 @@ class MethodCall:
     obj: Any; method: str; args: List[Any]; line: int = 0
 
 @dataclass
+class AttributeAccess:
+    obj: Any; attr: str; line: int = 0
+
+@dataclass
+class AttributeAssign:
+    obj: Any; attr: str; value: Any; line: int = 0
+
+@dataclass
 class ReturnStmt:
     value: Optional[Any]; line: int = 0
 

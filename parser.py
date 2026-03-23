@@ -5,6 +5,7 @@ from lexer import Token, TokenType
 from ast_nodes import (
     Program, Number, String, Identifier, ListLiteral, IndexAccess, IndexAssign,
     BinaryOp, UnaryOp, Assignment, FunctionCall, MethodCall,
+    AttributeAccess, AttributeAssign,
     ReturnStmt, BreakStmt, ContinueStmt,
     IfStmt, ElifClause, WhileStmt, ForStmt, FuncDef, ClassDef,
 )
@@ -45,6 +46,11 @@ class Parser:
             return self._maybe_index_assign()
         if t == TokenType.IDENTIFIER and self._peek_t(1) == TokenType.EQUAL:
             return self._assignment()
+        if (t == TokenType.IDENTIFIER
+                and self._peek_t(1) == TokenType.DOT
+                and self._peek_t(2) == TokenType.IDENTIFIER
+                and self._peek_t(3) == TokenType.EQUAL):
+            return self._attr_assign()
         node = self._expr()
         self._expect_nl()
         return node
@@ -107,6 +113,14 @@ class Parser:
         name = self._consume(TokenType.IDENTIFIER, "Expected class name").lexeme
         self._consume(TokenType.COLON, "Expected :"); self._expect_nl()
         return ClassDef(name, self._block(), tok.line)
+
+    def _attr_assign(self):
+        obj_tok = self._adv()
+        self._adv()  # '.'
+        attr_tok = self._adv()
+        self._consume(TokenType.EQUAL, "Expected =")
+        val = self._expr(); self._expect_nl()
+        return AttributeAssign(Identifier(obj_tok.lexeme, obj_tok.line), attr_tok.lexeme, val, obj_tok.line)
 
     def _maybe_index_assign(self):
         name_tok = self._adv(); self._adv()
@@ -220,11 +234,13 @@ class Parser:
         while True:
             if self._check(TokenType.DOT):
                 self._adv()
-                mt = self._consume(TokenType.IDENTIFIER, "Expected method name")
-                self._consume(TokenType.LPAREN, "Expected (")
-                args = self._args()
-                self._consume(TokenType.RPAREN, "Expected )")
-                node = MethodCall(node, mt.lexeme, args, mt.line)
+                mt = self._consume(TokenType.IDENTIFIER, "Expected attribute name")
+                if self._check(TokenType.LPAREN):
+                    self._adv(); args = self._args()
+                    self._consume(TokenType.RPAREN, "Expected )")
+                    node = MethodCall(node, mt.lexeme, args, mt.line)
+                else:
+                    node = AttributeAccess(node, mt.lexeme, mt.line)
             elif self._check(TokenType.LBRACKET):
                 self._adv(); idx = self._expr()
                 self._consume(TokenType.RBRACKET, "Expected ]")
